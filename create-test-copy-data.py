@@ -24,7 +24,7 @@ async def create_test_file(fs, sema, dest_base, file_size, depth):
 
         path = os.path.join(path, token)
 
-        print(f'writing {path}')
+        # print(f'writing {path}')
 
         async with await fs.create(path) as out:
             while file_size > 0:
