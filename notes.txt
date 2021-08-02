@@ -1,4 +1,6 @@
 
+ - verify checksums
+
 test-copy <config>
   create-vm <name>
   create-test-data
