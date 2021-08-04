@@ -1,0 +1,33 @@
+vms:
+ - name: gcp
+   cloud: gcp
+   create: "gcloud beta compute --project=broad-ctsa instances create __NAME__ --zone=us-central1-a --machine-type=n2-standard-8 --scopes=https://www.googleapis.com/auth/cloud-platform --image=ubuntu-2104-hirsute-v20210720 --image-project=ubuntu-os-cloud --boot-disk-size=100GB --boot-disk-type=pd-balanced --local-ssd=interface=NVME --local-ssd=interface=NVME --metadata-from-file=startup-script=./gcp-startup-script.sh"
+   delete: "gcloud -q compute --project=broad-ctsa instances delete __NAME__"
+ - name: aws
+   cloud: aws
+   create: "aws ec2 run-instances --region us-east-1 --image-id ami-09e67e426f25ce0d7 --count 1 --instance-type m5d.2xlarge --key-name default --security-group-ids sg-0f33d2125c51fe47b --subnet-id subnet-ee350ae0 --tag-specifications ResourceType=instance,Tags=[{Key=Name,Value=__NAME__}] --user-data file://./aws-startup-script.sh --block-device-mappings file://./mapping.json"
+   delete: "aws ec2 terminate-instances --region us-east-1 --instance-ids $(aws ec2 describe-instances --region us-east-1 --filter Name=tag:Name,Values=__NAME__ Name=instance-state-name,Values=pending,running | jq -r '.Reservations[0].Instances[0].InstanceId')"
+data-configs:
+  - name: one
+    size: '100Mi'
+    n-files: 1
+    depth: 0
+  - name: some
+    size: '100Mi'
+    n-files: 200
+    depth: 1
+aws-id-file: "~/.ssh/aws-broad-hail-bench-default"
+locations:
+ - path: /data/test-copy
+   create-on: aws
+__locations:
+ - path: gs://1-day/tmp/test-copy
+   create-on: gcp
+ - path: /data/test-copy
+   create-on: gcp
+cases:
+ - from: gs://1-day/tmp/test-copy
+   to: /data
+   run-on: gcp
+   branch: is/hail
+replicas: 1

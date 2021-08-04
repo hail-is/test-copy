@@ -1,6 +1,7 @@
 import sys
 import secrets
 import os.path
+import json
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from hailtop.batch_client.parse import parse_memory_in_bytes
@@ -41,7 +42,10 @@ async def create_test_data(fs, sema, dest_base, total_size, n_files, depth):
 
 
 async def main():
-    total_size = parse_memory_in_bytes(sys.argv[1])
+    config = json.loads(sys.argv[1])
+    total_size = parse_memory_in_bytes(config['size'])
+    n_files = config['n-files']
+    depth = config['depth']
     data_dest_base = sys.argv[2]
 
     with ThreadPoolExecutor() as thread_pool:
@@ -49,12 +53,7 @@ async def main():
                                           GoogleStorageAsyncFS(),
                                           S3AsyncFS(thread_pool)]) as fs:
             sema = asyncio.Semaphore(15)
-            await asyncio.gather(*[
-                create_test_data(fs, sema, f'{data_dest_base}/one', total_size, 1, 0),
-                create_test_data(fs, sema, f'{data_dest_base}/some', total_size, 200, 1),
-                # ~156 files/directory
-                create_test_data(fs, sema, f'{data_dest_base}/many', total_size, 40_000, 2)
-            ])
+            await create_test_data(fs, sema, data_dest_base, total_size, n_files, depth),
 
 
 if __name__ == '__main__':
