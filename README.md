@@ -62,6 +62,7 @@ config file, which also specifies which VM to run them on.
 The `test-copy` runs the tests given by the `cases` section of the
 config file.  A case is a source, destination, and place to run the
 test.  It writes the `results.json` file (and gives lots of output).
+`test-copy` does not verify the integrity of the copied data.
 
 The `cleanup` command deletes all the resources.
 
