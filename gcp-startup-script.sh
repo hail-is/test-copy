@@ -11,13 +11,9 @@ apt -y install python3-pip
 
 sudo -u ubuntu bash -c '
 cd /home/ubuntu
-git clone https://github.com/cseed/hail.git
+git clone https://github.com/hail-is/hail.git
 cd hail
-git remote add is https://github.com/hail-is/hail.git
-git fetch --all
 git checkout is/main
-cd ..
-git clone https://github.com/cseed/test-copy.git
 make -C /home/ubuntu/hail/hail python-version-info
 '
 

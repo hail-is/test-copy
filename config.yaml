@@ -5,29 +5,46 @@ vms:
    delete: "gcloud -q compute --project=broad-ctsa instances delete __NAME__"
  - name: aws
    cloud: aws
-   create: "aws ec2 run-instances --region us-east-1 --image-id ami-09e67e426f25ce0d7 --count 1 --instance-type m5d.2xlarge --key-name default --security-group-ids sg-0f33d2125c51fe47b --subnet-id subnet-ee350ae0 --tag-specifications ResourceType=instance,Tags=[{Key=Name,Value=__NAME__}] --user-data file://./aws-startup-script.sh --block-device-mappings file://./mapping.json"
-   delete: "aws ec2 terminate-instances --region us-east-1 --instance-ids $(aws ec2 describe-instances --region us-east-1 --filter Name=tag:Name,Values=__NAME__ Name=instance-state-name,Values=pending,running | jq -r '.Reservations[0].Instances[0].InstanceId')"
+   create: "aws --no-cli-pager ec2 run-instances --region us-east-1 --image-id ami-09e67e426f25ce0d7 --count 1 --instance-type m5d.2xlarge --key-name default --security-group-ids sg-0f33d2125c51fe47b --subnet-id subnet-ee350ae0 --tag-specifications ResourceType=instance,Tags=[{Key=Name,Value=__NAME__}] --user-data file://./aws-startup-script.sh --block-device-mappings file://./mapping.json --iam-instance-profile Arn=arn:aws:iam::551551808208:instance-profile/TestCopy"
+   delete: "aws --no-cli-pager ec2 terminate-instances --region us-east-1 --instance-ids $(aws --no-cli-pager ec2 describe-instances --region us-east-1 --filter Name=tag:Name,Values=__NAME__ Name=instance-state-name,Values=pending,running | jq -r '.Reservations[0].Instances[0].InstanceId')"
 data-configs:
   - name: one
-    size: '100Mi'
+    size: '5Gi'
     n-files: 1
     depth: 0
   - name: some
-    size: '100Mi'
+    size: '5Gi'
     n-files: 200
     depth: 1
+  - name: many
+    size: '5Gi'
+    n-files: 40000
+    depth: 2
 aws-id-file: "~/.ssh/aws-broad-hail-bench-default"
 locations:
- - path: /data/test-copy
-   create-on: aws
-__locations:
  - path: gs://1-day/tmp/test-copy
    create-on: gcp
  - path: /data/test-copy
    create-on: gcp
+ - path: s3://hail-test-dy5rg/tmp/test-copy
+   create-on: aws
+ - path: /data/test-copy
+   create-on: aws
 cases:
  - from: gs://1-day/tmp/test-copy
-   to: /data
+   to: /data/target
    run-on: gcp
-   branch: is/hail
+ - from: /data/test-copy
+   to: gs://1-day/tmp/test-copy/target
+   run-on: gcp
+ - from: s3://hail-test-dy5rg/tmp/test-copy
+   to: /data/target
+   run-on: aws
+ - from: /data/test-copy
+   to: s3://hail-test-dy5rg/tmp/target
+   run-on: aws
 replicas: 1
+git:
+  org: cseed
+  repo: hail
+  version: cseed/s3-opt
