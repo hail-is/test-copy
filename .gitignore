@@ -1,4 +1,5 @@
 /profile.txt
 *~
 /save
-/bench.json
+/results.json
+/times.json
