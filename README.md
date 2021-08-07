@@ -52,6 +52,8 @@ A data configuration is a total size, the number of files to spread
 the data across, and the number of directory levels to include
 (directory names are hex digits so the branching factor is 16).
 
+`test-copy.py` is the main entrypoint.
+
 The `create-vms` command creates the VMs.
 
 The `create-data` command creates data in the locations given in the
