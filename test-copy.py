@@ -42,11 +42,11 @@ CONFIG = None
 
 
 @click.group()
-def main():
+@click.option('--profile')
+def main(profile):
     global PROFILE, CONFIG
 
-    with open('./profile.txt') as f:
-        PROFILE = f.read().strip()
+    PROFILE = profile
     print(f'PROFILE {PROFILE}')
 
     with open('./config.yaml') as f:
