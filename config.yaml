@@ -5,7 +5,7 @@ vms:
    delete: "gcloud -q compute --project=broad-ctsa instances delete __NAME__"
  - name: aws
    cloud: aws
-   create: "aws --no-cli-pager ec2 run-instances --region us-east-1 --image-id ami-09e67e426f25ce0d7 --count 1 --instance-type m5d.2xlarge --key-name default --security-group-ids sg-0f33d2125c51fe47b --subnet-id subnet-ee350ae0 --tag-specifications ResourceType=instance,Tags=[{Key=Name,Value=__NAME__}] --user-data file://./aws-startup-script.sh --block-device-mappings file://./mapping.json --iam-instance-profile Arn=arn:aws:iam::551551808208:instance-profile/TestCopy"
+   create: "aws --no-cli-pager ec2 run-instances --region us-east-1 --image-id ami-09e67e426f25ce0d7 --count 1 --instance-type m5d.2xlarge --key-name default --security-group-ids sg-0f33d2125c51fe47b --subnet-id subnet-ee350ae0 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=__NAME__}]' --user-data file://./aws-startup-script.sh --block-device-mappings file://./mapping.json --iam-instance-profile Arn=arn:aws:iam::551551808208:instance-profile/TestCopy"
    delete: "aws --no-cli-pager ec2 terminate-instances --region us-east-1 --instance-ids $(aws --no-cli-pager ec2 describe-instances --region us-east-1 --filter Name=tag:Name,Values=__NAME__ Name=instance-state-name,Values=pending,running | jq -r '.Reservations[0].Instances[0].InstanceId')"
 data-configs:
   - name: one
