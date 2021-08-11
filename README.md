@@ -32,10 +32,10 @@ To run this you will need:
    the ODP account).  See:
    https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html.
 
- - An ssh keypair for broad-hail-bench-default in
-   ~/.ssh/aws-broad-hail-bench-default AWS account to be able to log
-   into instances in that account.  You can manage those in the AWS
-   console.
+ - The AWS "Key pair" named "default" must be saved in PEM format in
+   ~/.ssh/aws-broad-hail-bench-default. If you didn't create the default key
+   pair, then you need to delete the existing one and create a fresh one also
+   named "default". Ideally, this tool would be parameterized by a key pair.
 
  - A Hail package must be installed for the `cleanup` command that uses
    AsyncFS.rmtree.
